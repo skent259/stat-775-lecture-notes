@@ -1,0 +1,218 @@
+# Graphs and Conditional Independence (concluded) {#lecture7}
+
+Lecture Date: 2/12/2020 
+
+Scribes: Sean Kent
+
+***
+
+## Graphs and Conditional Independence (concluded)
+
+### Example: (genetics)
+
+$$
+1 \to 3 \\
+2 \to 3 \\
+3 \to 5 \\
+4 \to 5
+$$
+
+- $G_i =$ genetic info on person $i$
+- Two alleles $a, A$
+- $G_i \in \{\{a,a\},\{a,A\},\{A,A\}\}$
+- $G_1, G_2, G_3, G_4, G_5$
+
+joint mass: 
+$$
+p(g_1, g_2, g_3, g_4, g_5)
+= p(g_1)\cdot p(g_2)\cdot p(g_3 | g_1, g_2)\cdot p(g_4)\cdot p(g_5 | g_3, g_4)
+$$
+
+by the DAG, which encodes the factorization
+
+e.g. if the population is in the H.W. equilibrium, 
+
+$$
+p(g_1) 
+= 
+\begin{cases}
+p^2 & \text{if } \{a,a\} \\
+2 pq & \text{if } \{A,a\}\\ 
+q^2 & \text{if } \{A,A\}
+\end{cases}
+$$
+
+where $p,q$ are the allele frequencies
+
+We can figure out a big joint probability table for $g_3$ based on the observed values of $g_1$ and $g_2$ 
+
+$$
+\begin{matrix}
+g_1 & g_2 & & g_3 & \\
+ &  & aa & aA & AA \\
+aa & aa & 1 & 0 & 0 \\
+aa & Aa & 1/2 & 1/2 & 0 \\
+aa & AA & 0 & 1 & 0\\
+Aa & aa & 1/4 & 3/4 & 0 \\
+Aa & Aa & 1/4 & 1/2& 1/4\\
+Aa & AA & 0 & 1/2 & 1/2 \\
+AA & aa & 0 & 1 & 0 \\
+AA & Aa & 0 & 1/2 & 1/2 \\
+AA & AA & 0 & 0 & 1 \\
+\end{matrix}
+$$
+
+
+Undirected
+
+
+Full conditional $p(x_i | x_{-i}) = p(x_i | x_{nb(i)})$
+
+Any joint distribution will have *some* graphical representation, the key is when there is a parsimonious structure that makes the joint calculation feasible
+
+
+
+$$
+\begin{aligned}
+p(g_4 | g_{-4}) 
+&= P(G_4 = g_4 \mid g_1, g_2, g_3, g_5) \\
+&= \frac{p(g_1, g_2, g_3, g_4, g_5)}{p(g_1, g_2, g_3, g_5)} \\
+&\propto p(g_1, g_2, g_3, g_4, g_5) \\
+&= p(g_1)\cdot p(g_2)\cdot p(g_3 | g_1, g_2)\cdot p(g_4)\cdot p(g_5 | g_3, g_4) \\
+&\propto p(g_4)\cdot p(g_5 | g_3, g_4)
+\end{aligned}
+$$
+
+When we think about this distribution, we are varying $g_4$(which can be  \{a,a\} \{A,a\} \{A,A\}). We also know that these probabilities add up to one. Since the conditional is the joint divided by the marginal, and the marginal doesn't depend on $g_4$ we know that the conditional is proportional to the joint. 
+
+So whatever the full conditional is, it is proportional to the joint, and we can evaluate it for every possible value of $g_4$ and make sure it adds up to $1$. 
+
+We know that the joint is then proportional to the values that only depend on $g_4$.We want to know what other variables are in the conditional that affect the distribution. Only the values that are left in the last proportional statement(its neighbors in the directed graph).
+
+If we pick a different value to vary, it has different neighbors to consider. If we consider $g_1$ instead...
+
+$$
+\begin{aligned}
+p(g_1 | g_{-1}) 
+&\propto p(g_1)\cdot p(g_2)\cdot p(g_3 | g_1, g_2)\cdot p(g_4)\cdot p(g_5 | g_3, g_4) \\
+&\propto p(g_1)\cdot p(g_3 | g_1, g_2)\\
+\end{aligned}
+$$
+
+Again, it is proportional to the joint factorization that eliminates non-neighbors.
+
+From this calculation, we would draw an (undirected) edge between 1 and 2, and 1 and 3
+
+
+The full undirected representation looks like 
+
+$$
+1 \to 2 \\
+1 \to 3 \\
+2 \to 3 \\
+3 \to 4 \\
+3 \to 5 \\
+4 \to 5
+$$
+
+**Note**: All of the edges that were present in the directed representation also show up in the undirected representation.  However we have to **also** include all parents of a given node's children (which is why there are edges between 3 and 4, and 1, and 2).  
+
+This leads to a **graph construction rule** for the undirected graph:
+
+- Add edges between co-parents of same nodes
+- Drop the directions (but keep the edges) from the directed graph
+
+It makes sense when you think of the joint distribution generally as a distribution $p(X) = p(x_1)\Pi_{i = 2}^np(x_i \mid x_{pa(i)})$
+
+**Remark**: Term for this procedure is often called "moralizing the graph", relating to 'marrying' the co-parents
+
+**Note**: there are forbidden pairings of "alleles" in this example(ie aa aa parents cannot have Aa AA children). This means the positivity condition is not satisfied.  
+
+**Definition:** For a given graph, $X$ is a **Markov Random Field** (MRF) wrt $G$ if 
+$$p(x_i \mid x_{-i}) = p(x_i \mid x_{nb(i)})$$
+
+
+
+
+### Example: Field trial 
+
+- data yields $Y_1, Y_2,\ldots,Y_n$
+- fertilities $F_1, F_2, \dots, F_n$
+- Hidden markov structure where $F_i \to F_{i+1}$ and $F_i \to Y_i$ for all $i$.  
+  - The undirected representation simply removes the directions on the edges
+
+
+$$
+\begin{aligned}
+p(f) 
+&= p(f_1)\cdot p(f_2 | f_1) \cdot p(f_3 | f_2) \cdot p(f_4 | f_3) \cdots \\
+p(y \mid f) &= \Pi p(y_i \mid f_i) \\
+p(f,y) &= p(f_1) \cdot p(y_1 | f_1) \cdot p(f_2 | f_1) \cdot p(y_2 | f_2) \cdot p(f_3 | f_2) \cdot p(y_3 | f_2) \cdots\\
+\end{aligned}
+$$
+
+Therefore, 
+$$
+p(f_2 | else) \propto p(f_2 | f_1) p(y_2 | f_2) p(f_3 | f_2)
+$$
+
+and the node $F_2$ needs edges with $F_1, Y_2$, and $F_3$.  
+
+Say we have a model where $F_1, \dots, F_n \sim Ar(1)$
+- $F_1 \sim N(0, \frac{\sigma ^2}{1 - \phi ^2})$
+- $F_i \mid F_1, \dots, F_{i-1}  \sim N(\phi F_{i-1}, \sigma^2)$
+- $Y_i \mid F_i \sim N(F_i, \sigma_y^2)$
+- $\sigma, \sigma_y, \text{and } \phi$ are additional model parameters, which complicates the DAG
+
+Then the DAG is as before except the node $\sigma^2$ points to $F_i$ for all $i$;  the node $\phi$ points to $F_i$ for all $i$; the node $\sigma_y^2$ points to $Y_i$ for all $i$.  
+
+The undirected graph adds edges between $\sigma^2$ and $\phi$, and between $\sigma_y^2$ and $F_i$ for all $i$.  
+
+Now we know that if we needed to work out the probability distribution of $\sigma_y^2$ we would need to have the different yields and fertilities (all the neighbors in the directed graph).
+
+
+## Gibbs
+
+Recall that $X$ is Gibbs w.r.t. a graph $G$ if 
+
+$$
+p(x) = \prod_{c \in \mathcal{C}} \psi_c(x_c)
+$$
+
+where $\mathcal{C}$ is the set of cliques in the graph $G$.  
+
+**Ising Model**
+
+- $X = \{X_i\}$
+- $X_i = \{-1, 1\}$
+
+$$
+p(x) = \exp \left( \phi \sum_{e \in E, e = \{i,j\}} x_ix_j \right)
+= \prod_{c \in \mathcal{C}} \exp \left( \phi x_i x_j \right)
+$$
+
+- $x$ is a realization of plusses (+) and minuses (-)
+- $p(x)$ counts up the number of times that neighboring $x_i$ are the same
+- This distribution is Gibbs (see above)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

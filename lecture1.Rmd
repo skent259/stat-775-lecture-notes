@@ -1,0 +1,105 @@
+# Probability, Betting Model, Polya's Urn {#lecture1}
+
+Lecture Date: 1/22/2020
+
+Scribe: Sean Kent
+
+***
+
+## Probability
+
+
+There are a few ways to think about probability
+
+- counting favorable spaces
+- long-run frequency
+  - requires thoughts about how the conditions need to be the same
+- mathematical
+  - "axioms of probability"
+- prices in a fair gamble (see de Finetti Betting Model)
+
+Consider the following experiment:
+
+- toss tack
+  - might land one of two ways
+    - on head
+    - on pin and head
+
+
+What is $Pr(\textrm{land on head})$? 
+
+
+Probability can be interpreted more broadly than just long run outcomes, can be thought of as a "degree of belief" under some Bayesian analysis.
+
+## de Finetti Betting Model
+
+Bruno de Finetti thought about probability as a "degree of belief", and formulated the following thought experiment to show this called the betting model.  
+
+Betting model: 
+
+  - two people: broker, client
+  - **events**: $E_1, E_2, \dots$
+  - broker establishes **provisions** $q_1, q_2, \dots$ associated with events
+  - client establishes **stakes** $s_1, s_2, \dots \in \mathbb{R}$, which can be positive or negative.
+  - **transaction**: client gives broker $q_i s_i$ in exchange for $s_i 1[E_i]$ ($s_i$ if $E_i$ is true)
+  - **gain** $= s_i 1[E_i] - q_i s_i = s_i \left( 1[E_i] - q_i \right)$ 
+
+One big question: how should the broker establish the $q_i$ to describe his degree of belief?  He should try to avoid a **Dutch Book**, when the broker is guaranteed to lose money and client is guaranteed to gain money.  
+
+What if the broker sets provisions such that $q_i < 0$?  The client can set $s_i > 0$ and ensure that gain $> 0$.  Thus, avoiding a Dutch book requires $q_i \geq 0$.
+
+What if the broker sets provisions such that $q_i > 1$?  The client can set $s_i < 0$ and ensure that gain $> 0$.  Thus, avoiding a Dutch book requires $q_i \leq 1$.
+
+What if there are two disjoint events $E_1, E_2$ and three transactions $E_1, E_2, E_3 = E_1 \cup E_2$?  Then gain $= s_1 1[E_1] + s_2 1[E_2] + s_3 1[E_3] - (s_1 q_1 + s_2 q_2 + s_3 q_3)$.  
+
+  - if $E_1$, gain $g_1 = s_1 + s_3 - (s_1 q_1 + s_2 q_2 + s_3 q_3)$
+  - if $E_2$, gain $g_2 = s_2 + s_3 - (s_1 q_1 + s_2 q_2 + s_3 q_3)$
+  - if $(E_1 \cup E_2)^C$, gain $g_3 =  - (s_1 q_1 + s_2 q_2 + s_3 q_3)$
+
+Then we can write $R s = g$ where $s = (s_1, s_2, s_3)$, $g = (g_1, g_2, g_3)$, and 
+
+$$
+R = \begin{bmatrix} 1-q_1 & -q_2 & 1-q_3\\ -q_1 & 1-q_2 & 1-q_3 \\ -q_1 & -q_2 & -q_3 \end{bmatrix}
+$$
+ 
+If $R$ is invertible, then client can get any gain $g$ he wants by setting $s = R^{-1} g$.  The broker needs $R$ not invertible to avoid a dutch book, i.e. $|R| = 0$. After a little bit of algebra to calculate the determinant $|R| = q_1 + q_2 - q_3$.  Thus, avoiding a Dutch book requires $q_3 = q_1 + q_2$. 
+
+These three examples show that  "**coherence**" or avoiding a dutch book requires the $q_i$ to satisfy the **axioms of probability**. 
+
+
+
+## Polya's Urn
+
+- An example of a model for learning probability of a binomial outcome attributed to George Polya
+- Urn with $a$ $1$'s and $b$ $0$'s
+- As if you map the experiment to the chance of reaching in the urn and grabbing one.  
+- If observe $X_1 = 0$, there are now $b + 1$ $0$'s in the urn
+- Sample over replace with **Polya's rule**:
+  - $P(X_n = 1 \mid X_1 = x_1, X_2 = x_2, \dots X_{n-1} = x_{n-1}) = \frac{a + \sum_i x_i}{a + b + n - 1}$
+  
+
+
+Consider joint probability
+$$
+P(X_1 = x_1, X_2 = x_2, \dots X_n = x_n)
+$$
+for any $x_1, x_2, \dots, x_n$, each $x_i \in \{0,1\}$
+
+**Example**: What if exactly one of $X_1, X_2, X_3$ is $1$?
+$$
+P(X_1 = 0, X_2 = 0, X_3 = 1) 
+= \left(\frac{b}{a+b}\right) \left(\frac{b+1}{a+b+1}\right)\left(\frac{a}{a+b+2}\right)
+$$
+
+$$
+P(X_1 = 0, X_2 = 1, X_3 = 0) 
+= \left(\frac{b}{a+b}\right) \left(\frac{a}{a+b+1}\right)\left(\frac{b+1}{a+b+2}\right)
+$$
+
+$$
+P(X_1 = 1, X_2 = 0, X_3 = 0) 
+= \left(\frac{a}{a+b}\right) \left(\frac{b}{a+b+1}\right)\left(\frac{b+1}{a+b+2}\right)
+$$
+
+Then all 3 probabilities are equal!  This is called **exchangeability**, permuting the entries gives the same joint probability. 
+

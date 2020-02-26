@@ -1,0 +1,22 @@
+--- 
+title: "Stat 775 Lecture Notes"
+author: "Sean Kent, Mitchell Paukner, E Auden Krauska"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+description: "Scribed notes for Stat 775 - Introduction to Bayesian Decision and Control taught in Spring 2020."
+---
+
+# Introduction {-}
+
+Scribed notes for Stat 775 - Introduction to Bayesian Decision and Control taught in Spring 2020.
+
+Lecturer: Michael Newton
+
+Scribes contributing to these notes include Sean Kent, Mitchell Paukner, and E Auden Krauska
+

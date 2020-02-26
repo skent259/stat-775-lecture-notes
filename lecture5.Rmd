@@ -1,0 +1,218 @@
+# Independence and Graphs {#lecture5}
+
+Lecture Date: 2/5/2020
+
+Scribes: Sean Kent, Mitchell Paukner, Auden Krauska 
+
+***
+
+Some foundational issues
+
+- Integrating different data sets
+- Propogating uncertainty
+    - Compare to the "plug-in-principle" in statistics, sometimes works very well and sometimes it doesn't.
+    - Can avoid plug-in 
+
+Will appreciate these facts more when we understand more of the Bayesian framework...hold on to these ideas...
+
+
+## Independence and conditional independence (review)
+
+
+Recall:
+
+**Definition**: Events $A \perp B$ ($A$ is **independent** of $B$) if $P(A \cap B) = P(A) \cdot P(B)$ 
+
+
+**Definition**: If $C$ is another event, $P(C) > 0$, then we say that $A$ and $B$ are **conditionally independent** given $C$, $A \perp B|C$, if: 
+
+$$
+P(A \cap B \mid C) = P(A \mid C) \cdot P(B \mid C)
+$$
+
+Note: $A \perp B \mid C$ implies that $A^C \perp B \mid C$ but not necessarily that $A \perp B \mid C^C$
+
+Question: What if $A \perp B|C$, what is $P(A|B\cap C)$? 
+Conditional probability, so it is equal to $\frac{P(A \cap B \cap C)}{P(B\cap C)} = \frac{P(A \cap B |C)P(C)}{P(B|C)P(C)} = P(A \mid C)$
+
+"erasing rule"
+
+
+**Definition:** **Random variables** are mappings $X, Y, Z$ from sample space to $\mathbb{R}$ ($X:\Omega \rightarrow \mathbb{R}$)
+
+Events and random variables:
+  -  $[X = x] = \{\omega \in \Omega : X(\omega) = x\}$ 
+  - With continuous random variables we are more often thinking of events such as $[X \leq t]$.
+
+**Definition**: Random variables $X,Y$ are **independent** if all associated events are independent: 
+
+$$
+X \perp Y \iff [X = x] \perp [Y = y] \quad \forall x,y
+$$
+
+Same for conditional independence of random variables.
+
+$$
+X \perp Y \mid Z \iff [X = x] \perp [Y = y] \mid [Z = z] \quad \forall x,y,z
+$$
+
+These notions are useful for: 
+
+- Modeling tools
+- Helps to reduce complexity
+
+Example: Lithotripsy (using shock waves that don't affect tissue but break up kidney stones)
+
+- Let $I$ be some measure of image quality.
+- Let $D$ be some measure of degradation of stone after treatment.$
+- Let $C = 1[clearance]$
+- If the image quality isn't great, it might be hard to measure the other things
+- **Model:** $C \perp I \mid D \Rightarrow P(C = c \mid D = d, I = i) = P(C=c \mid D = d)$
+  - This is saying that chance of clearance doesn't depend on the image quality $I$ given the degradation, $D$.
+
+Example: Genetics
+
+- Let $G$ be genotype of a person.
+- Let $Y$ be the phenotype of a person.
+- Might have other variables
+  - $G_{parents}$, $Y_{parents}$
+  - $G_{uncles}$, $Y_{uncles}$
+- Maybe okay to assume **Model:** $Y \perp Y_{parents} \mid G_{parents}$
+  - maybe not okay to assume this...
+
+Example: Ag field trial (strips of land in a plot)
+
+- data $Y_1, Y_2, \dots, Y_n$ where $Y_i$ is the crop yield for plot $i$, for example.  
+- Known that in field trials there may be hard to measure effects (say, from the fertility in the group) that affect $Y_i$ and will cause some correlation.  
+- Fertility $F_1, F_2, \dots, F_n$ as a latent variable.  
+- Model: $Y_1, \dots, Y_n$ are conditionally independent given $F_1, \dots, F_n$.  
+
+Example: Somatic Mutations and Cancer
+
+- tumor suppression genes (normal genes, but are defective in some way, they suppress tumors when activated)
+- $A_{g,i} = 1\{ \text{gene g incurs some mutation in a tumor i }\}$
+- $H_{g} = 1\{ \text{gene g incurs some suppressor gene}\}$
+- **Model**: $\{A_{g,i}\}$ conditionally independent give $H_g$
+
+### Complexity of Model
+
+The reason people talk about conditional independence is due to the *complexity of models*.
+
+The joint distribution of $Y_1, Y_2, \dots, Y_n, F_1, F_2, \dots, F_n$ is much much simpler if there is conditional independence.  
+
+
+If there are no constraints with $2n$ binary variables we have $2^{2n} - 1$ free probabilities.
+
+If there are tons of constraints, even ones we wouldn't believe, like $Ag$ are all independent with Bernoulli probabilities, there are $2n$ success probabilities. If you specify independence, then there are fewer parameters to model = lower model complexity. 
+
+
+## Graphs
+
+Representing dependence in a joint distribution
+
+$$
+I \rightarrow D \rightarrow C
+$$
+
+- nodes for R.V.'s, $\{V\}$
+  - variable list 
+- edges to indicate dependencies, $\{E\} \subset V \times V$
+  - can be directed or undirected
+  - in directed graphs, $e \in E$ with $e = (u,v)$ means that $(v,u) \notin E$ 
+  - in undirected graphs, $e \in E$ with $e = (u,v)$ means that $(v,u) \in E$ 
+- planar arrangement is meaningless 
+
+These graphs imply a statement about related probabilities:
+
+$$
+P\left( I = i, D = d, C = c \right)
+= P(I=i) \cdot P(D = d \mid I = i) \cdot P(C = c \mid D = d)
+$$
+
+Ordinarily the joint distribution would not allow for this simplification.
+
+Note: we will often shorten the notation $P\left( I = i, D = d, C = c \right) = p(i,d,c) = p(i) p(d | i) p(c | d)$, although there is potential confusion with this. 
+
+If we had an edge from $I$ to $C$ we would have a full(saturated) model.  The probability for this would be $p(i) p(d | i) p(c | d,i)$
+
+When you have a series of three random variables, you can always write the joint distribution as a product of conditional distributions. Sometimes that product simplifies (which is what is encoded in the graph).
+
+Any R.V.s $X_1, X_2, \dots, X_n$, 
+
+$$
+\begin{aligned}
+p(x_1, x_2, \dots, x_n) 
+&= p(x_n | x_1, x_2, \dots, x_{n-1}) p(x_{n-1} | x_1, x_2, \dots, x_{n-2}) \cdots p(x_1) \\
+&= p(x_1) p(x_2 | x_1) p(x_3 | x_1, x_2) \cdots
+\end{aligned}
+$$
+
+
+$I \rightarrow D \rightarrow C$ is a structure of dependencies and not probabilities
+
+Note: there is not a unique directed graphical representation.  Think about if we had taken the order to be $C, D, I$, we would have $p(c) p(d|c) p(i | d,c)$, which may not reduce from the graph we have.  
+
+
+
+Good example for next time: 
+$$
+G_{mom} \rightarrow Y_{off} \leftarrow G_{dad}
+$$
+
+$G_{mom}, G_{dad}, Y_{off}$
+
+$Y_{off}, G_{mom}, G_{dad}$ with joint density $p(y) p(g_{mom} | y) p(g_{dad} | g_{mom}, y)$
+
+
+1st order Markov chain: $X_1 \to X_2 \to X_3 \cdots$
+
+$$
+p(x_1, x_2, \dots, x_n)  
+= p(x_1) p(x_2 | x_1) p(x_3 | x_2) p(x_4 | x_3) \cdots
+$$
+
+### Drawing rule
+
+Write down in order $X_1, X_2, \dots, X_n$
+
+Look back $p(x_i | x_1, \dots, x_{i-1}) = p(x_i | \text{ subset of } x_j's)$
+
+$PA_i = \textrm{Parents}_i \subset \{X_1, \dots, X_{i-1}\}$
+
+$\overline {PA}_i = \textrm{Nonparents}_i = \textrm{Parents}_i^C$
+
+$X_i \perp X_{\overline{PA}_i} \mid X_{PA_i}$
+
+The drawing rule:
+
+- write down $X_1, X_2, \dots, X_n$
+- march through the variables, add a directed edge from each parent $PA_i$ to $i$.  
+
+If you're in the tack tossing model, you will have the long run success probability $\theta$ with multiple edges going out to different $X_1,X_2, \ldots$
+
+
+Plate notation:
+
+Compact way of writing a probability model for multiple variables (e.g. $X_i$ for $i = 1,\dots,n$).  
+
+These are called directed acyclical graphs (D.A.G) and are particularly good for the generative phase, but not good for inference because the directions become "more annoying"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

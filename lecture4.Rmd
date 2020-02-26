@@ -1,0 +1,224 @@
+# Stein, Neyman-Scott, Kiefer-Wolfowitz {#lecture4}
+
+2/3/2020
+
+Scribes: Sean Kent, Mitchell Paukner, Auden Krauska 
+
+***
+
+**Note:** most of this lecture doesn't have much to do with Bayesian estimation, but it is part of the foundations to understand why anyone would bother with Bayesian analysis. 
+
+
+## Stein (1962)
+
+$$
+X = (X_1, \dots, X_p) \sim N(\theta, \Sigma)
+$$ 
+where $\theta = (\theta_1, \dots, \theta_p)$, $\Sigma = I_p$. 
+
+
+**Task**: estimate $\theta$ from $X$
+
+$$
+L(\theta, a) = \sum_{j=1}^p (\theta_j - a_j)^2
+$$
+
+Risk = MSE
+
+Maximum Likelihood, unbiased $\delta_{ML}(X) = X$
+
+James-Stein: $\delta_{JS}(x) = X \left(1 - \frac{p-2}{S} \right)$
+
+where $S = X^T X = \sum_{j=1}^p X_j^2$
+
+Take p = 3
+
+$$
+\delta_{JS}(x) = X \left(1 - \frac{p-2}{S} \right) = 
+\begin{pmatrix}
+X_1 (1 - \frac{1}{S}) \\
+X_2 (1 - \frac{1}{S}) \\
+X_3 (1 - \frac{1}{S})
+\end{pmatrix}
+$$
+
+What is $R(\theta,\delta_{JS})$?
+
+$$
+\begin{aligned}
+R(\theta,\delta_{JS}) &= E \left[\sum_{j = 1}^3 (X_j - X_{j}/S - \theta_j)^2\right]\\
+&= E \left[\sum_{j = 1}^3 \left( (X_j -  \theta_j) - X_{j}/S \right)^2 \right]\\
+&= 3 + E\left\{ \sum_j \frac{X_j^2}{S^2}\right\} - 2 E\left\{ \sum_j \frac{X_j(X_j - \theta_j)}{S}\right\}
+\\
+&= 3 + E\left\{ \frac{1}{S} \right\} - 2 E\left\{ \sum_j \frac{X_j(X_j - \theta_j)}{S}\right\}
+\end{aligned}
+$$
+
+where the expectation is under the generative model $p(x \mid \theta)$ (i.e. the data, the $X_j$ are random).
+
+**Aside**: $S = \sum_{j=1}^3 X_j^2$ has Noncentral $\chi^2$ distribution
+
+Fact: $E(\frac{1}{S}) < \infty$ if $p \geq 3$, but this moment is not finite when $p = 1,2$.  
+
+
+Working with 
+
+$$
+\begin{aligned}
+E\left\{ \sum_{j=1}^3 \frac{X_j(X_j - \theta_j)}{S}\right\} = A_1 + A_2 + A_3
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+A_1 &=  E\left\{ \frac{X_1(X_1 - \theta_j)}{S} \right\}\\
+&= \int \int \int \frac{x_1(x_1 - \theta_1)}{s}p(x_1,x_2,x_3)dx_1dx_2dx_3
+\end{aligned}
+$$
+
+But we have for the inner integral (after factoring out the densities that related to $x_2$ and $x_3$) 
+
+$$
+\begin{aligned}
+B
+&= \int \frac{x_1(x_1 - \theta_1)}{s} \phi(x_1 - \theta_1) dx_1 \\
+\end{aligned}
+$$
+
+where $\phi(z) = \frac{1}{\sqrt{2 \pi}} e^{-z^2/2}$
+
+Using integration by parts... $(\int u v' = uv |_{-\infty}^{\infty{}} - \int u' v)$
+
+set $v' = -(x_1 - \theta_1) \phi(x_1 - \theta_1)$ and $u = -x_1 / s$.  This means that $v = \phi(x_1 - \theta_1)$ and $u' = 2 x_1^2 / s^2 - 1 / s$ and we have
+
+$$
+\begin{aligned}
+B &= -  \int \left(\frac{2 x_1^2}{s^2}- \frac{1}{s} \right) \phi(x_1 - \theta_1) dx_1 \\
+\end{aligned}
+$$
+
+Putting this together, 
+$$
+A_1 = \int_{\mathbb{R}^3} \left(\frac{1}{s} - \frac{2x_1^2}{s^2} \right)p(x_1)p(x_2)p(x_3)dx_1 dx_2 dx_3
+$$
+
+Considering 
+
+$$
+\begin{aligned}
+A_1 + A_2 + A_3 
+&= \int_{\mathbb{R}^3} \left( \frac{3}{s} - \frac{2}{s} \right) p(x_1,x_2,x_3) dx_1 dx_2 dx_3\\
+&= E\left(\frac{1}{S}\right)
+\end{aligned}
+$$
+
+
+$$
+\begin{aligned}
+R(\theta, \delta_{JS}) 
+&= 3 + E\left(\frac{1}{S}\right) - 2E\left(\frac{1}{S}\right) \\
+&= 3 - E\left(\frac{1}{S}\right) \\
+&< 3 = R(\theta, \delta_{ML})
+\end{aligned}
+$$
+
+which follows once we note that as long as $p > 3$, we have that $E\left(\frac{1}{S}\right)$ is a positive number that's less than $\infty$.
+
+$\hat{\theta}_{JS} = X\left(1 - \frac{1}{S}\right)$
+
+It turns out that $\delta(X) = X$ is admissible if $p = 1,2$, but not when $p \geq 3$. 
+
+**Intuition**: even though $E[X] = \theta$ is unbiased, that is only a part of the story: it is not admissible. 
+
+$$
+S = \sum X_j^2
+$$
+is the squared length of $X$.
+
+
+$$
+\begin{aligned}
+E \left[ S \right] 
+&= \text{ expected squared length of naive } \delta_{ML} \\
+&= E \left[ \sum X_j^2 \right] \\
+&= \sum_{i=1}^p \left[ 1 + \theta_j^2 \right] \\
+&= p + \theta^T \theta
+\end{aligned}
+$$ 
+
+
+$\delta_{ML}$ is too long on average.
+
+**Note**: This is somewhat counterintuitive, but only makes sense when you think of trying to control the errors of $X_1, \dots, X_n$ **all at once**.  In this case, you need to shrink the estimate, and the individual estimates which normally make sense don't work.  
+
+This suggests the need for thinking differently about combining the results of multiple portions of an analysis.
+
+
+
+
+## Neyman-Scott (1948)
+
+Just after RA Fisher came with maximum likelihood, going to be asymptotically unbiased, efficient, all these great properties. 
+
+e.g. 
+
+- $\text{Data} = D = \{D_i: i = 1,2,\ldots,n\}$
+- $D_i = (X_i, Y_i)$ all independent
+- $X_i, Y_i \sim^{i.i.d.} N(\mu_i, \sigma^2)$
+- Two measurements on each $\mu_i$, with constant variance. 
+- lots of parameters $\theta = (\mu_1, \mu_2, \dots, \mu_n, \sigma^2)$
+
+What is $\hat \theta_{ML}$?
+
+$$
+L( \theta) = p(\textrm{data} \mid \theta) = \prod_{i = 1}^{n} p(x_i \mid \mu_i, \sigma^2)p(y_i \mid \mu_i, \sigma^2)
+$$
+
+
+$$
+\ell(\theta) = \log L (\theta) = \sum_{i = 1}^n \left\{ \log \frac{1}{\sigma} \phi \left( \frac{x_i - \mu_i}{\sigma}\right)  + \log \frac{1}{\sigma} \phi \left( \frac{y_i - \mu_i}{\sigma}\right) \right\}
+$$
+
+<!-- $$
+\rightarrow \sum\left\{ log\frac{1}{\sigma}\phi(\frac{x_i - \mu_i}{\sigma}) + log\frac{1}{\sigma}\phi(\frac{y_i - \mu_i}{\sigma})\right\}
+$$ -->
+
+After going through all of the calculus involved (details above are left up to the student)...
+
+
+$$
+\begin{aligned}
+\hat{\mu}_i &= \frac{x_i + y_i}{2} 
+\\
+\hat{\sigma}^2_{ML} 
+&= \frac{1}{4n} \sum_{i=1}^n (X_i - Y_i)^2  \\
+& \overset{a.s.}{\rightarrow} \frac{1}{4} E\left(X_i - Y_i\right)^2 \\ 
+&= \frac{1}{4} 2\sigma^2 \\
+&= \sigma^2/2
+\end{aligned}
+$$
+
+This means that the ML estimate for the variance is systematically wrong! (biased) on average.  
+
+## Kiefer-Wolfowitz (1956)
+
+- Still interested in 
+  - incidental parameters $\theta_1, \theta_2,\ldots,\theta_n$ and 
+  - other structural parameters $\psi$. 
+- $\hat{\psi}_{ML}$ may be inconsistent from the observations of Neyman-Scott
+- Likelihood = $\Pi_i p(\mathrm{data}_i \mid \theta_i, \psi)$
+- KW argue that : 
+  - IF $\theta_i \sim^{i.i.d} G$, a population of parameters
+  - THEN $L_{KW}(\psi, G) = \Pi_i p(\mathrm{data}_i \mid \psi, G)$
+    - marginal $\int p(\textrm{data}_i \mid \psi, \theta_i) dG(\theta_i)$
+    - $(\hat{\psi}_{KW-ML}, \hat{G}_{KW-ML}) \to (\psi, G)$
+    - Consistency is recovered!
+- "When you've got a lot of parameters, you might not go so wrong as to assume that they come from a population of parameters" ~a quote MN likes to say
+
+(Looking at R code Talks/bd2web/R/s.html. Simulation of mse, can see that the JS estimator is uniformly under the naive. He will post the code.)
+
+
+
+
+
+

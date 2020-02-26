@@ -1,0 +1,173 @@
+# Statistical Decision Theory {#lecture3}
+
+Lecture Date: 1/29/2020
+
+Scribes: Sean Kent, Mitchell Paukner
+
+***
+
+## Statistical Decision Theory (A. Wald)
+
+
+- nothing Bayesian about this theory, but Bayesian methods can get a boost from it.  
+
+### In this theory there is:
+
+- data $X \in \mathcal{X}$
+- parameters $\theta$
+- model $P(x \mid \theta)$
+  - "specification"
+- "Actions" $a \in \mathcal{A}$
+  - inferences
+- "Decision Rules" $\delta: \mathcal{X} \rightarrow \mathcal{A}$
+- "Loss" $L(\theta, a) \geq 0$
+  - Might measure error of an action
+- "Risk" $\mathcal{R}(\theta,\delta) = E(L(\theta, \delta(\mathcal{X}))$
+  - Depends on the state of nature $\theta$ and the decision rule $\delta$ 
+  - $E(L(\theta, \delta(\mathcal{X}))$ is w.r.t $P(x \mid \theta)$ (the model)
+  - Importantly, risk does *not* depend on the data
+
+
+### Example
+
+$$
+X \sim N(\theta, 1)
+$$
+
+$$
+\mathcal{A} = \mathbb{R}, \quad \delta(x) = \bar{x}
+$$
+
+$$
+L(\theta, a) = |\theta - a|^2
+$$
+
+$$
+\implies \text{Risk} = \text{MSE}
+$$
+
+Or we could have
+
+$$
+\begin{aligned}
+\mathcal{A} = \{H_0, H_0^C\} \\
+\end{aligned}
+$$
+
+$$
+L(\theta, a) = 
+\begin{cases}
+    1 \quad \text{if } \theta \in H_0, a = H_0^c \text{ (Type I error)} \\
+    1 \quad \text{if } \theta \in H_0^C, a = H_0 \text{ (Type II error)} \\
+    0 \quad else
+\end{cases}
+$$
+
+$$
+Risk = 
+\begin{cases}
+    \text{Significance Level} \quad (\text{if } H_0) \\
+    1 - \text{Power} \quad (\text{if }H_0^c) \\
+\end{cases}
+$$
+
+
+Note: 
+
+$\delta_c(x)  = c x$ $\,\,\,\,$ (inadmissible if $c > 1$)
+
+$$
+\begin{aligned}
+R(\theta, \delta) 
+&= E \left[ (\theta - cX)^2\right] \\
+&= E \left[ \theta^2 - 2 \theta c X + c^2 X^2 \right] \\
+&=  \theta^2 - 2 c \theta^2 + c^2 E \left[ X^2 \right] \\
+&=  \theta^2 - 2 c \theta^2 + c^2 (1 + \theta^2)
+\end{aligned}
+$$
+
+Where:
+
+$$
+E(X^2) = Var(X) + (E(X))^2 = 1 + \theta^2
+$$
+
+Can plot this out and think about how different $c$ and $\theta$ will affect the risk, and how to minimize risk.  Can choose different places to minimize risk (hopefully for many values of $\theta$).  
+
+### Procedure Heuristics
+
+What is the good of this for suggesting procedures that we should use? Do they have good operating characteristics?
+
+We should just find procedures that minimize risk $R(\theta,\delta)$? But there are some risk profiles that you cannot compare. So it isn't obvious how to accomplish this. But some options include:
+
+- *restrict* the class of procedure first, then *minimize risk* in that class (tends to work well)
+  - (ie within class of unbiased estimators) this leads to thinking about, for example, minimum variance unbiased estimators (UMVUE)
+  - Constrain the significance level, maximize the power (often gives the likelihood ratio test)
+- *eliminate* "inadmissible" procedures
+  - e.g. if $\delta_1$ has higher risk for every value of $\theta$ than the risk of some $\delta_2$, then $\delta_1$ is inadmissible.  More formally...
+  - **Definition**: $\delta_2$ is **inadmissible** if there exists a $\delta_1$ such that $R(\theta,\delta_1) \leq R(\theta,\delta_2)$ with strict inequality somewhere.
+  - **Definition**: $\delta_2$ **admissible** if it's not inadmissible.
+
+**Remark:** in the normal example above, one can show that $\delta_c$ with $c > 1$ is inadmissible.
+
+
+## Back to the Bayesian view
+
+Additions to the framework:
+
+- "prior" $p(\theta)$
+- Bayes Risk: $r(\delta) = E[\mathcal{R}(\theta,\delta)] = \int_\theta \int_x L(\theta, \delta(x))\, p(x \mid \theta)\, p(\theta) dx \, d\theta$ 
+    - this risk is w.r.t. $p(\theta)$ (the belief in the unknown parameter $\theta$)
+    - this is a real valued number greater than 0, can be used to directly compare multiple decision rules 
+    - However, the prior will change bayes risk and is determined by the analyst
+    - How would you calculate $r(\delta)$?
+- Bayes rule: any procedure that minimizes the Bayes Risk $r(\delta)$
+
+
+Calculating the Bayes Risk:
+
+Remembering Fubini's theorem and adding distribution of the data $p(x)$, we can describe 
+
+$$
+\begin{aligned}
+E[\mathcal{R}(\theta,\delta)] 
+&= \int_x \int_\theta p(x) L(\theta, \delta(x))\, \frac{p(x \mid \theta)\, p(\theta)}{p(x)} d\theta \, dx \\
+&= \int_x \int_\theta p(x) L(\theta, \delta(x))\, p(\theta \mid x)\, d\theta \, dx \\
+&= \int_x p(x) \int_\theta L(\theta, \delta(x))\, p(\theta \mid x)\, d\theta \, dx 
+\end{aligned}
+$$
+
+Where the second line follows from Bayes Rule in probability. $p(\theta \mid x)$ is known as the posterior probability and $p(x)$ is *predictive*
+
+The term $\int_\theta L(\theta, \delta(x))\, p(\theta \mid x)\, d\theta$ is known as the "Posterior Expected Loss" $\rm{PEL}(x, \delta(x))$.   
+
+So $r(\delta) = E[\,\rm{PEL}(x,\delta(x))\,]$ wrt. $p(x)$
+
+
+**Fact:** You may compute a Bayes Rule by minimizing $\rm{PEL}(x,\delta(x))$ for each $x$. This is true because minimizing PEL for each data set will certainly minimize the average PEL over possible datasets.  
+
+**Fact:** Under weak regularity conditions, if $\delta^*$ is a Bayes rule, then $\delta^*$ is admissible. 
+
+*Proof:* If not, there exists $\check{\delta}$ s.t. $R(\theta, \check{\delta}) \leq R(\theta, \delta^*)$ for all $\theta$ and the inequality is strict somewhere.  Then the average risk would share a similar relation: $r(\check{\delta}) \leq r(\delta^*)$ under some technical conditions. But this means that there's some other rule that has a potentially lower Bayes Risk, which contradicts the fact that $\delta^*$ is a Bayes rule.  
+
+
+**Remark:** The nice thing about this framework is that once you define a prior, and model specification, there is a roadmap to which you can 'crank out' the Bayes Rule, which is at least going to be admissible.  
+
+## Preview for Next Lecture {-}
+
+
+- High dimensionality
+  - Neyman-Scott 
+  - Kieten-Wolfowitz
+  - Stein 1962
+    - $X = (X_1,X_2,X_3)^T \sim N((\theta_1,\theta_2,\theta_3)^T, I_3)$
+    - Trying to estimate $\theta$
+    - Use $\delta(X) = X$
+    - Loss $L(\theta, a) = \sum_{j=1}^3 (\theta_j - a_j)^2$ is squared error loss
+    - Showed that $\delta(X) = X$ is inadmissible (but didn't say what would beat it!)
+      - James-Stein (~ 2 years later) developed an estimator that beats it (birth of Empirical Bayes world)
+
+
+
+
+

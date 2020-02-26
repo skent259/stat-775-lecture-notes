@@ -1,0 +1,302 @@
+# Undirected Graphs, Hammersley-Clifford {#lecture6}
+
+Lecture Date: 2/10/2020 (Auden's bday!)
+
+Scribes: Sean Kent, Mitchell Paukner, Auden Krauska 
+
+***
+
+Last time:
+
+- DAG
+  - ordering $X_1, X_2, \dots, X_n$
+  - $X_i \perp X_{\overline{PA}_i}|X_{PA_i}$
+  - $p(x_1, x_2, \dots, x_n) = p(x_1) p(x_2 | x_1) \dots p(x_n | x_1, \dots, x_{n-1})$
+  - e.g. for $X_1  \to X_3 \to X_4$, $X_2 \to X_4$
+  - $p(x_1, \dots, x_4) = p(x_1) p(x_2 | x_1) p(x_3 | x_1) p(x_4 | x_3, x_2)$
+  - This is useful for model building / "generative"
+  - Also useful for simulation (once we know the probabilities)
+  - Not so useful for inference
+
+- Undirected Graphs
+
+e.g.  First order Markov Chain
+
+$$
+X_1 \to X_2 \to X_3
+$$
+
+joint prob $p(x_1, x_2, x_3) = p(x_1) p(x_2 | x_1) p(x_3 | x_2)$
+
+There are more conditional dependencies that are implied by the model. Eg: 
+
+$$
+\begin{aligned}
+p(x_1, x_3 | x_2) 
+&= \frac{p(x_1, x_2, x_3)}{p(x_2)} \\
+&= \frac{p(x_1) p(x_2 | x_1) p(x_3 | x_2) }{p(x_2)}\\
+&= p(x_2)p(x_1\mid x_2)\frac{p(x_3 | x_2) }{p(x_2)}\\
+&= p(x_1 | x_2) p(x_3 | x_2) \\
+& \implies X_1 \perp X_3 \mid X_2
+\end{aligned}
+$$ 
+
+In a large first-order Markov Chain, $X_{past} = \{X_1, \dots, X_{i-1}\}, X_{present} = X_{i}, X_{future} = \{X_{i+1}, \dots, X_n\}$
+$$
+X_{past} \perp X_{future} \mid X_{present}
+$$
+
+
+
+
+## Global, Local, and Pairwise Markov Properties
+
+
+Let graph $G = (V,E)$ "undirected" where $V =$ set of variable names and $E \subset V \times V$ (unordered) pairs $e = \{i,j\}$ for  $i,j \in V$.  We will let the verticies be given by R.V.'s $X = \{X_v : v \in V \}$.  
+
+<!-- Dependencies via the Markov Property -->
+
+<!-- - Global property:  -->
+<!-- - Local property:  -->
+<!-- - Pairwise property:  -->
+
+Consider a toy example: 
+
+$X_1 X_2 X_3 X_4 X_5 X_6 X_7$
+
+0    1   0   0   0   0   0
+1    0   1   1   1   0   0 
+0    1   0   1   0   0   0 "a" 
+0    1   1   0   0   0   0
+0    1   0   0   0   1   1
+0    0   0   0   1   0   1 "b"
+0    0   0   0   1   1   0
+
+$A = {X_1, X_3, X_4}$, 
+$B = {X_6, X_7}$, 
+$C = {X_2,X_5}$
+
+
+### Global
+
+**Definintion**: Let $A,B,C$ be a partition of the vertices of graph $G$. We say that $C$ is a **separator** of $A,B$ if all paths from $a \in A$ to $b \in B$ pass through $C$. 
+
+**Definition**: The **Global Property** relative to $G$ is satisfied if $\forall$ partitions of vertices $A,B,C$ with $C$ a separator, $X_A \perp X_B \mid X_C$
+
+
+### Local
+
+**Definition**: Let $nb(i) = \{j \in V : e = \{i,j\} \in E\}$ and $R_i$ = rest of graph = $V \setminus \left[\{i \} \cup nb(i) \right]$.  The **Local Property** relative to $G$ is satisfied if $\forall i$, $X_i \perp X_{R_i} \mid X_{nb(i)}$.
+
+
+<!-- - $\forall i \in V$, consider the neighborhood  -->
+<!-- - $R_i$ = rest of graph = $V \setminus \left[\{i \} \cup nb(i) \right]$ -->
+<!-- - Local property says: $\forall i$, $X_i \perp X_{R_i} \mid X_{nb(i)}$ -->
+**Remark**: Global Property $\implies$ Local Property. Take $A = \{i\}$, $B = R_i$, $C = nb(i)$.
+
+Reconsidering the example, we have: 
+
+$X_1 X_2 X_3 X_4 X_5 X_6 X_7$
+
+0    1   1   0   0   0   0
+1    0   1   1   1   0   0  "i"
+1    1   0   1   0   0   0 
+0    1   1   0   0   0   0
+0    1   0   0   0   1   1
+0    0   0   0   1   0   1 
+0    0   0   0   1   1   0
+
+$R_i = \{X_6, X_7\}$ (the rest of the graph)
+
+Thinking as before: 
+
+$A = X_2$ (node $i$), 
+$C = X_1, X_3, X_4, X_5$ (neighbors, separators), 
+$B = X_6, X_7$ ($R_i$)
+
+
+
+### Pairwise
+
+**Definition**: For a given $i$, Let $V = \{i\} \cup \{j\} \cup K$ where $i,j$ are not neighbors and let $K$ be everything else. The **Pairwise Property** relative to $G$ is satisfied if $\forall i$,  $X_i \perp X_j \mid X_K$.
+
+<!-- - $V = \{i\} \cup \{j\} \cup K$ -->
+<!--   - where $i,j$ are not neighbors -->
+<!--   - $K$ is everything else -->
+<!-- - $X$ satisfies pairwise property relative to $G$ if $X_i \perp X_j \mid X_K$ -->
+**Challenge problem** (good for homework or quiz): prove Local Property $\implies$ Pairwise Property
+
+
+```{theorem, name="Pearl and Paz (1987)"}
+Under the positivity condition, the Pairwise Property $\implies$ the Global Property.  
+```
+
+
+```{corollary}
+Global Property $\iff$ Local Property $\iff$ Pairwise Property.
+```
+
+This says that for a given joint distribution given a graph, any of the properties imply the others.  
+
+
+<!-- '87 Pearl & Paz: -->
+
+<!-- - under "positivity condition",  pairwise $\implies$ global -->
+<!-- - i.e. global $\iff$ local $\iff$ pairwise -->
+<!-- - "For a given joint distribution given a graph, any of the properties imply the others" -->
+
+## Positivity, MRF, and Hammersley-Clifford
+
+
+**Defintion**: A set of random variables $X_i, i = 1,\dots,n$ satisfies the **positivity condition** if $P(X_i = x_i) = 0$ marginally for all $i$ $\implies$ $P \left(\bigcap_i [X_i = x_i]\right) = 0$ jointly.  
+
+<!-- NOTE: I originally had $P \left(\bigcap_i [X_i = x_i]\right) > 0$ in notes, but couldn't rationalize the definition -->
+
+The positivity condition essentially means "no forbidden combinations".
+
+### Example
+
+Consider $n = 3$, $X_1, X_2, X_3$ all binary, and the following two distributions
+
+Distribution 1:
+
+if $X_3 = 1$, 
+
+$$
+x_2 \\ x_1
+\begin{bmatrix}
+  & 0 & 1 & \\
+0 & 1/4 & 0 \\
+1 & 1/4 & 0
+\end{bmatrix}
+$$
+
+
+if $X_3 = 0$, 
+
+$$
+x_2 \\ x_1
+\begin{bmatrix}
+  & 0 & 1 & \\
+0 & 0 & 1/4 \\
+1 & 0 & 1/4
+\end{bmatrix}
+$$
+
+
+Distribution 2:
+
+if $X_3 = 1$, 
+
+$$
+x_2 \\ x_1
+\begin{bmatrix}
+  & 0 & 1 & \\
+0 & 3/8 & 0 \\
+1 & 3/8 & 0
+\end{bmatrix}
+$$
+
+
+if $X_3 = 0$, 
+
+$$
+x_2 \\ x_1
+\begin{bmatrix}
+  & 0 & 1 & \\
+0 & 0 & 1/8 \\
+1 & 0 & 1/8
+\end{bmatrix}
+$$
+
+
+<!-- Positivity condition means "no forbidden combinations" -->
+
+<!-- IF $P(X_i = x_i) = 0$ marginally for all $i$ THEN $P \left(\bigcap_i [X_i = x_i]\right) > 0$ jointly -->
+
+
+We note that both distributions have the same full conditional: $P(X_3 = 1 \mid X_1 = x_1, X_2 = x_2)$.  However, positivity fails here.  
+
+
+**Definition**: Given an undirected graph $G = (V,E)$ and R.V.'s $X = \{X_v : v \in V\}$, We say joint distribution is a **Markov Random Field** w.r.t. $G$ if 
+
+$$
+X_i \perp X_{\text{non-neighbors}} \mid X_{nb(i)}
+$$
+
+**Remark**: Markov Random Field is principally the same as the Local Property
+
+
+e.g. 1st order Markov chain
+
+$X_1 \to X_2 \to X_3 \to \dots$ (directed)
+
+Also could draw this with the edges being undirected
+
+
+
+
+Another way to consider local
+
+$p(x_i \mid x_{-i}) = p(x_i \mid x_{nb(i)})$
+
+$x_i$ is the variable of interest, and $x_{i-1}$ is everything else, since the non-neighbor values don't help us in any way with prediction. It only depends on the neighbors. 
+
+In the early 1970's, there was a big expansion outside of Time Series (from ARMA outwards) that were trying to develop probability models for data that is not arranged in order (eg, arranged in space like voxels). How do you build up a probability model? The joint distribution has to be determined. Directed representation immediately gives us the density. If we only have a bunch of specifications of probability, is there a joint distribution that would have those joint probabilities at all? If we have a joint distributions, we can make the marginal and conditional distributions. What if you only have the local conditional distributions?
+
+If positivity fails, then no. If you have positivity, then yes. 
+
+Eg: 
+$X_1 X_2 X_3 X_4 X_5 X_6$
+
+ 0   1   1   1   0   0  
+ 1   0   1   0   0   0 
+ 1   1   0   0   0   0
+ 1   0   0   0   1   1
+ 0   0   0   1   0   1 
+ 0   0   0   1   1   0
+
+ $X_1, X_2$
+ $X_4, X_5, X_6$ are cliques
+
+**Definition**: $A \subset V$ is **complete** if $\forall i,j \in A$, $e = \{i,j\} \in E$.
+
+**Definition**: $A$ is a **clique** if it is maximally complete (trying to add a node will make the subset incomplete).  
+
+Cliques can overlap, and do not have to be a partition. Cliques are a set of nodes that are fully connected. 
+
+
+<!-- name a graph $G$, find cliques -->
+
+**Definition**: $X = \{X_v : v \in V\}$ has a Gibbs distribution relative to $G$ if 
+
+$$
+p(x) = \prod_{c \in \rm{cliques}} \psi_c(x_c)  
+$$
+for some $\psi_c$.  
+
+
+```{theorem, name = "Hammersley Clifford"}
+Under the positivity condition, A graph $G$ has a Gibbs distribution $\iff$ it is a MRF (it satisfies the Local Markov Property). 
+
+```
+
+This is the critical link between joint and conditional distributions.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

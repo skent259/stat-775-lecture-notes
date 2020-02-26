@@ -1,0 +1,171 @@
+# Polya, Mixtures, and De Finetti Theorem {#lecture2}
+<!-- # Lecture 1 {-} -->
+
+Lecture Date: 1/27/2020
+
+Scribe: Sean Kent
+
+***
+
+## Polya's Urn (revisited)
+
+Sequence $X_1, X_2, \dots, X_n$ mapping to $\{0,1\}$ (Bernouli random variables).  
+
+$$P(X_n = 1 \mid X_1 = x_1, X_2 = x_2, \dots X_{n-1} = x_{n-1})  \\
+=  \left( \frac{a + s_{n-1}}{a + b + n -1}\right)^{x_n} \left( \frac{a + \bar{s}_{n-1}}{a + b + n -1}\right)^{\bar{x}_n}$$
+
+where $x_i \in \{0,1\}$, $\bar{x}_i = 1- x_i$, $s_{n-1} = \sum_{i = 1}^{n-1} x_i$, and $\bar{s}_{n-1} = \sum_{i = 1}^{n-1} \bar{x}_i$
+
+### Calculation of Joint Distribution
+
+for any $x_1, x_2, \dots, x_n$,
+
+$$
+\begin{aligned}
+f(x_1, x_2, \dots, x_n) 
+&= P(X_1 = x_1, X_2 = x_2, \dots X_{n} = x_{n}) \\
+&= P(X_1 = x_1) P(X_2 = x_2 \mid X_1 = x_1)  \dots P(X_n = x_n \mid X_1 = x_1, \dots, X_{n-1} = x_{n-1}) \\
+&= \left( \frac{a}{a+b} \right)^{x_1} 
+\left( \frac{b}{a+b} \right)^{\bar{x}_1} 
+\left( \frac{a+x_1}{a+b+1} \right)^{x_2} \\
+&\left( \frac{b+\bar{x}_1}{a+b+1} \right)^{\bar{x}_2} 
+\left( \frac{a+x_1+x_2}{a+b+2} \right)^{x_3} 
+\left( \frac{b+\bar{x}_1+\bar{x}_2}{a+b+2} \right)^{\bar{x}_3} \dots \\
+&= \frac{A*B}{(a+b)(a+b+1) \dots (a+b+n-1)}
+\end{aligned}
+$$
+
+where 
+
+$$A = \left[ (a)^{x_1}(a+x_1)^{x_2}(a+x_1+x_2)^{x_3} \dots (a+x_1+x_2+\dots+ x_{n-1})^{x_{n}}\right]$$
+and 
+$$B = \left[ (b)^{\bar{x}_1}(b+\bar{x}_1)^{\bar{x}_2}(b+\bar{x}_1+\bar{x}_2)^{\bar{x}_3} \dots (b+\bar{x}_1+\bar{x}_2+\dots+ \bar{x}_{n-1})^{\bar{x}_{n}}\right]$$
+
+
+Note that we can also get (via some induction)
+
+$$A = (a)(a+1)\dots (a+s_n-1) = \frac{\Gamma(a + s_n)}{\Gamma(a)}$$
+
+and 
+
+$$B = \frac{\Gamma(b + \bar{s}_n)}{\Gamma(b)}$$
+
+and the denominator as 
+
+$$\frac{\Gamma(a + b + n)}{\Gamma(a + b)}$$
+
+Putting this all together we get that 
+
+$$
+\begin{aligned}
+P(X_1 = x_1, X_2 = x_2, \dots X_{n} = x_{n}) 
+= \frac{\Gamma(a + s_n)\Gamma(b + n - s_n)\Gamma(a + b)}{\Gamma(a)\Gamma(b)\Gamma(a + b + n)}
+\end{aligned}
+$$
+
+NOTE: this depends on the data only through the sum $s_n$.  
+
+### Exchangeability in Polya's Urn
+
+Let $\Pi = (\pi_1, \dots, \pi_n)$ be a permutation of $\{1,2,\dots,n\}$.  Let $Y = (Y_1, \dots, Y_n)$ s.t. $Y_i = X_{\pi_i}$.  What is $P(Y_1 = y_1, Y_2 = y_2, \dots, Y_n = y_n)$?
+
+$$
+\begin{aligned}
+P(Y_1 = y_1, Y_2 = y_2, \dots, Y_n = y_n) 
+&= P(X_{\pi_1}  = y_1, X_{\pi_2} = y_2, \dots, X_{\pi_n} = y_n) \\
+&= P(X_{1}  = y_{\phi_1}, X_{2}  = y_{\phi_2}, \dots, X_{n}  = y_{\phi_n}) \\
+&= f \left(\sum_{i=1}^n y_{\phi_i}\right) \\
+&= f \left(\sum_{i=1}^n y_{i}\right) \\
+&= P(X_1 = y_1, X_2 = y_2, \dots, X_n = y_n) 
+\end{aligned}
+$$
+
+Where $X_1 = y_{\phi_1}$ and $\phi$ is determined by $\phi_i = j \iff \pi_j = i$ (inverse map on the indices).  
+
+## Properties of Exchangeability
+
+**Definition:** 
+if $X_\Pi =^d X$ for all permutations $\Pi$, then we say $X$ is **exchangeable** (for fixed $n$).  
+
+Aside: $X_1,X_2,\dots$, is exchangeable if $(X_1,\dots,X_n)$ is exchangeable for all $n$. 
+
+Exchangeability imposes constraints on the way the probabilities can occur in the model.  
+
+
+di Finetti viewed exchangeability as an important way to express uncertainty.  
+
+
+**Fact**: Identical distribution
+
+
+Under exchangeability, the marginal distribution 
+$$
+\begin{aligned}
+P(X_7 = 1)
+&= \sum_{x \in \{0,1\}^n : x_1 = 1} P(X_1 = x_1, X_2 = x_2, \dots X_7 = 1, X_8 = x_8, \dots) \\
+&= \sum_{x \in \{0,1\}^n : x_7 = 1} P(X_1 = 1, X_2 = x_2, \dots X_7 = x_1, X_8 = x_8, \dots) \\
+&= P(X_1 = 1)
+\end{aligned}
+$$
+
+which means identically distributed marginally.  
+
+**Fact**: if i.i.d., then exchangeable but exchangeable does not imply i.i.d. 
+
+
+### Mixtures and Exchangeability
+
+2-stage experiment 
+
+- $Z \sim f$
+- $X \mid Z = z$ ~ other distribution 
+
+
+e.g. $Z = \frac{1}{10}$ w.p. $\frac{1}{2}$ and $Z = \frac{9}{10}$ w.p. $\frac{1}{2}$.  
+
+e.g $X = (X_1,\dots, X_n)$, and $X_1,\dots,X_n \mid Z = z \sim^{iid} Bern(z)$
+
+$$
+\begin{aligned}
+P(X_1 = x_1, \dots X_n = x_n)
+= \frac{1}{2} P\left(X = x \mid Z = \frac{1}{10}\right) + \frac{1}{2} P\left(X = x \mid Z = \frac{9}{10}\right) \\
+= \frac{1}{2} \left( \frac{1}{10} \right )^{s_n} \left( \frac{9}{10} \right )^{\bar{s}_n} + \frac{1}{2} \left( \frac{9}{10} \right )^{s_n} \left( \frac{1}{10} \right )^{\bar{s}_n}
+\end{aligned}
+$$
+
+Therefore, by example, mixtures of conditional i.i.d.'s are exchangeable
+
+
+What if $Z \sim Beta(a,b)$?
+
+$f(z) = \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} z^{a-1} (1-z)^{b-1}$
+
+$$
+\begin{aligned}
+P(X_1 = x_1, \dots X_n = x_n) 
+&= \int_0^1 P(X = x \mid Z = z) P(Z = z) dz \\
+&= \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} 
+\frac{\Gamma(a+s_n)\Gamma(b+\bar{s}_n)}{\Gamma(a+b+n)} \int_0^1 \frac{\Gamma(a+b+n)}{\Gamma(a+s_n)\Gamma(b+\bar{s}_n)} z^{a+s_n-1} (1-z)^{b+\bar{s}_n-1} dz \\
+&= \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} 
+\frac{\Gamma(a+s_n)\Gamma(b+\bar{s}_n)}{\Gamma(a+b+n)} 
+\end{aligned}
+$$
+
+Note this is exactly what we got from the Polya formula.  This means that Polya($a$,$b$) is a Beta mixture of i.i.d. Bernoulli's. 
+
+
+
+**de Finetti Theorem**: $X_1, X_2, \dots$ are exchangeable (Bernoulli trials) *iff* $\exists Z \sim f$ s.t. $X_1,\dots X_n \mid Z=z$  conditionally i.i.d Bernoulli($z$).  Furthermore, 
+$$
+\lim_{n \to \infty} \frac{1}{n} \sum_{i=1}^n X_i =^{a.s.} Z
+$$
+
+Bridge between subjective and classical views.  In the language of the tack experiment, Polya's model would say that you don't know the underlying long-run parameter for proportion of successes, but youre attributing the uncertainty to a beta distribution.  
+
+Something on Hewitt-Savage... maybe an extension 
+
+Next time work on the benefits that come out of operationalizing this formulism.  
+
+
+
+

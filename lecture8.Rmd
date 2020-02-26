@@ -1,0 +1,238 @@
+# Gibbs and Decisoin Theory (revisited) {#lecture8}
+
+Lecture Date: 2/17/2020
+
+Scribes: Sean Kent, Mitchell Paukner, Auden Krauska 
+
+***
+
+## Quiz/Exam on Wednesday
+- Some multiple choice, short answer
+- A couple of longer problems
+- Everyone should be able to solve the problems in the class time
+- Homework solutions have been posted on the class site
+- Closed book/closed note
+- Know theoretical results, haven't proved in any detail, but should be able to say the results, such as: 
+  - De Finetti Theorem
+  - Neyman Scott Problem
+  - Kiefer Wolfowitz
+  - Hammersly clifford theorem
+- One question on decision theory on the quiz
+
+
+## Gibbs Distribution
+
+$X = (X_1, \dots, X_n)$
+
+$p(x) = \Pi_{c \in \mathcal{C}} \varphi_c(x_c)$
+
+
+$\mathcal{C} =$ set of cliques of graph $G$
+
+### Ising Model Lattice
+
+$X_i \in \{-1, 1\}$
+
+$$
+\begin{aligned}
+p(x) 
+&= \frac{1}{K} \exp \left( \phi \sum_{e \in E, e = \{i,j\}} x_ix_j \right) \\
+&= \frac{1}{K} \prod_{c \in \mathcal{C}} \exp \left( \phi x_i x_j \right) \\
+&= \prod_{c \in \mathcal{C}} \psi_c(x_c)
+\end{aligned}
+$$
+
+
+where 
+$$
+\psi_c(x_c) = \frac{\exp \left( \phi x_i x_j \right)}{K}
+$$
+
+
+It's hard to build up this joint distribution from a DAG representation.
+
+
+Recall that H.C. says Gibbs $\iff$ MRF
+Forward is fairly easy, backwards is harder
+
+$$
+\begin{aligned}
+p(x_i | x_{-i}) &= \frac{p(x)}{p(x_{-i})} \\
+&\propto p(x) \\
+&= \prod_{c \in \mathcal{C}} \varphi_c(x_c)\\
+&\propto \prod_{c \in \mathcal{C}, i \in \mathcal{C}} \varphi_c(x_c)\\
+&= \rm{function}(x_i, x_{nb(i)})
+\end{aligned}     
+$$
+
+The distribution of $x_i$ only depends on it's neighbors in the graph.
+
+This implies MRF w.r.t. $G$
+
+Going back to the Ising model:
+
+$$
+\begin{aligned}
+p(x_i &| x_{-i}) \,\, \text{for Ising}\\
+&\propto \exp \left( \phi \sum_{e \in E, e = \{i,j\}} x_ix_j \right) \\
+&=  \exp \left( \phi x_i \sum_{j \in nb(i)} x_j \right) \\
+&=  \exp \left( \phi x_i s_i \right) \\
+\end{aligned}  
+$$
+
+Then we have that 
+
+$$
+\begin{aligned}
+P(X_i = +1) 
+&= \frac{\exp\{\phi s_i\}}{\exp\{\phi s_i\} + \exp\{-\phi s_i\}} \\
+& = \frac{\exp\{2\phi s_i\}}{\exp\{2\phi s_i\} + 1}
+\end{aligned}  
+$$
+
+Looks like logistic regression.  They call this an "Auto logistic" process.  
+
+There is an important example with multivariate normals
+
+### MVN
+
+$$
+X = (X_1, \dots, X_n) \sim N(0, \Sigma)
+$$
+
+$\Sigma$ is $m \times m$ covariance matrix, and $0$ is a $m$ vector of 0's.  
+
+
+When $\Sigma$ is pos def, we can define the density: 
+$p(x) \propto exp\{\frac{-1}{2} x^T \Sigma^{-1}x\}$
+
+$$
+\Sigma = 
+\begin{bmatrix}
+\sigma_1^2 & \rho_{ij} \sigma_i \sigma_j & ... \\
+& \sigma_2^2 & & ... \\
+& & \ddots & & \\
+& & & \sigma_m^2
+\end{bmatrix}
+$$
+
+The typical off-diagonal element is $\rho_{i,j}\sigma_i\sigma_j$
+
+We know for Normal variables, if the correlation is 0, then the variables are independent. 
+
+$p(x) \propto \exp\{\frac{-1}{2} x^T \Psi x\}$, where $\Psi = \Sigma^{-1}$, called the precision matrix. 
+
+$$
+\begin{aligned}
+p(x|x_i) \propto \exp\left\{\frac{-1}{2} x^T \Psi x \right\}
+\end{aligned}  
+$$
+
+We are fixing $i$, so $x^T \psi x$ is a double sum over the indices.
+
+$$
+\begin{aligned}
+x^T \psi x
+&= \sum_u \sum_v x_u \cdot x_v \cdot \psi_{u,v}\\
+&= x_i^2\psi_{ii} + x_i \sum_v x_v \psi_{iv} + x_i \sum_u x_u \psi_{ui} + \text{other stuff} \\
+&= x_i^2\psi_{ii} + 2 x_i \sum_v x_v \psi_{iv} +  \text{other stuff (constant wrt i)}
+\end{aligned}
+$$
+
+*Line 3* : If $\psi_{iv}$ is 0, then $x_v$ is not a neighbor to $x_i$.
+
+Procedure:
+
+- Start with $\Sigma \to \Psi = \Sigma^{-1}$
+- Look for 0's in $\Psi$
+- This gives us a graph $G$ with edge between $i,j$ is $\psi_{ij} \neq 0$
+  - Rule: $\{i,j\} \in E \iff \psi_{ij} \neq 0$
+
+The complexity of the graph depends on $\Psi$. There is a lot of work in fitting probability models where you try to estimate the covariance matrix(such as Lasso). We are trying to take multivariate data, but want to allow for it to be possibly not complicated. We will use an objective function that tries to force 0 correlations to eliminate edges in the graph.  This can be done with the so-called "Graphical LASSO"
+
+### Fertility 
+
+[Some stuff on the field fertility example that may be thrown up onto the website...]
+
+Point is that you can view the joint for this Gibbs distribution as a product over cliques based on the graphical representation.  
+
+
+
+
+## Decision Theory (revisited)
+
+Will ask a question about this on the quiz
+
+Problem 4 from homework
+
+- Finite actions $a \in \Theta$
+- say $\theta \in \{ 1, 2, \dots, k\}$
+- $L(\theta, a) = 1 - 1[\theta = a]$
+- Risk = $P(\delta(x) \neq \theta \mid \theta)$
+- Bayes risk $r(\delta) = P(\delta(x) \neq \theta) = E \left[ P(\delta(x) \neq \theta \mid X = x) \right]$
+- Bayes rule minimized bayes risk 
+  - Approach 1: find bayes risk, and minimize over it to get bayes rule (involves a double integral)
+  - Approach 2: find PEL, minimize over that (only one integral)
+
+- $PEL(\delta(x)) = ...$
+
+$$
+\delta_B(x) = \arg \max_a P(\theta = a \mid X = x)
+$$
+
+Bayes rule on 0-1 loss is posterior mode
+
+Problem 5 from homework
+
+- $\theta = (\theta_1, \dots, \theta_n)$
+- each $\theta_i \in \{ 0,1\}$
+- $\delta_B(x) = \arg\max_a P(\theta = a \mid X = x) = \arg\max_a \prod_i P(\theta_i = a_i \mid X = x_i)$ because of independence
+
+
+
+
+Other problem with non-independence
+
+- Toy example $n = 3$
+  - $\theta = (\theta_1, \theta_2, \theta_3)$
+  - each $\theta_i \in \{ 0,1\}$
+- $0 < \alpha < \beta < 2 \alpha < 1$
+  - $\implies 2 \alpha < \alpha + \beta < 3 \alpha$
+  - $\implies 3\alpha + \beta < 2(\alpha+b) < 4\alpha + \beta = 1$
+  - Check that this means $\alpha + \beta < 1/2$
+- Posterior probability distribution
+  - $\alpha$ on 000, 010, 001, 100
+  - $\beta$ on 111 (Bayes estimate of 0-1 loss)
+  - 0 on 101, 110, 011
+  - total mass $4 \alpha + \beta$
+- $P(\theta_i = 1 \mid X) = \alpha + \beta$ (marginally)
+- Bayes estimate under the sum loss is 
+
+
+Hamming loss:
+
+$$
+\begin{aligned}
+&\sum _{i=1}^n 1\left[ \theta_i \neq a_i \right] = L(\theta,a)\\
+&PEL(a) = \sum _{i=1}^n P\left[ \theta_i \neq a_i \mid x_i\right]
+\end{aligned}
+$$
+
+minimize the sum by minimizing each piece, which is the marginal posterior mode. In the example, $\hat{\theta} = (0,0,0)$, but $\hat{\theta}_{MAP} = (1,1,1)$
+
+
+Another example
+
+- $X, \theta$
+- $L(\theta, a) = (\theta - a)^2$
+- $R(\theta, \delta) = E [ (\delta(x) - \theta)^2]$
+- $PEL(\delta(x)) = E[ (\theta - \delta(x))^2 \mid X = x ] = E [ (\theta - m + m - \delta(x))^2 \mid X = x]$ where $m = E[\theta \mid X]$
+- $= Var(\theta \mid X = x) + (\delta(x) - m)^2$
+
+
+
+
+
+
+
+
